@@ -3,9 +3,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.alarm_control_panel import (
-    AlarmControlPanelEntity,
-    AlarmControlPanelEntityFeature,
+from homeassistant.components.alarm_control_panel import AlarmControlPanelEntity
+from homeassistant.components.alarm_control_panel.const import (
+    SUPPORT_ALARM_ARM_AWAY,
+    SUPPORT_ALARM_ARM_NIGHT,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -41,10 +42,7 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
     """Representation of a Hyyp alarm control panel."""
 
     coordinator: HyypDataUpdateCoordinator
-    _attr_supported_features = (
-        AlarmControlPanelEntityFeature.ARM_NIGHT
-        | AlarmControlPanelEntityFeature.ARM_AWAY
-    )
+    _attr_supported_features = SUPPORT_ALARM_ARM_AWAY | SUPPORT_ALARM_ARM_NIGHT
     _attr_code_arm_required = True
 
     def __init__(
