@@ -62,7 +62,6 @@ class HyypSwitch(HyypEntity, SwitchEntity):
                 self.coordinator.hyyp_client.set_zone_bypass,
                 self._partition_id,
                 self._zone_id,
-                0,
             )
 
         except (HTTPError, HyypApiError) as err:
@@ -81,7 +80,6 @@ class HyypSwitch(HyypEntity, SwitchEntity):
                 self.coordinator.hyyp_client.set_zone_bypass,
                 self._partition_id,
                 self._zone_id,
-                0,
             )
 
         except (HTTPError, HyypApiError) as err:
