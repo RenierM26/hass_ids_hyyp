@@ -35,16 +35,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         token=entry.data.get(CONF_TOKEN), pkg=entry.data.get(CONF_PKG)
     )
 
-    try:
-        await hass.async_add_executor_job(hyyp_client.login)
-
-    except (InvalidURL, HTTPError) as error:
-        _LOGGER.error("Unable to connect to Hyyp service: %s", str(error))
-        raise ConfigEntryNotReady from error
-
-    except HyypApiError as error:
-        raise ConfigEntryAuthFailed from error
-
     coordinator = HyypDataUpdateCoordinator(
         hass, api=hyyp_client, api_timeout=entry.options[CONF_TIMEOUT]
     )
