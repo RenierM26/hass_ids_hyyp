@@ -68,8 +68,11 @@ class HyypSwitch(HyypEntity, SwitchEntity):
         except (HTTPError, HyypApiError) as err:
             raise HyypApiError("Failed to turn on switch {self._attr_name}") from err
 
-        if update_ok:
+        if update_ok["status"] == "SUCCESS":
             await self.coordinator.async_request_refresh()
+
+        else:
+            raise HyypApiError(f"Failed to bypass zone: {update_ok}")
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch entity off."""
@@ -84,5 +87,8 @@ class HyypSwitch(HyypEntity, SwitchEntity):
         except (HTTPError, HyypApiError) as err:
             raise HyypApiError("Failed to turn on switch {self._attr_name}") from err
 
-        if update_ok:
+        if update_ok["status"] == "SUCCESS":
             await self.coordinator.async_request_refresh()
+
+        else:
+            raise HyypApiError(f"Disable bypass on zone: {update_ok}")

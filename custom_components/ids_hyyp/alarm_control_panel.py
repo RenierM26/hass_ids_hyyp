@@ -93,7 +93,7 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
             self._attr_state = STATE_ALARM_DISARMED
 
         else:
-            raise HTTPError("Cannot disarm alarm.")
+            raise HTTPError(f"Cannot disarm alarm: {response}")
 
     def alarm_arm_away(self, code: Any = None) -> None:
         """Send arm away command."""
@@ -112,7 +112,7 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
             self._attr_state = STATE_ALARM_ARMED_AWAY
 
         else:
-            raise HTTPError("Cannot arm alarm, check for violated zones.")
+            raise HTTPError(f"Cannot arm alarm, check for violated zones. {response}")
 
     def alarm_arm_night(self, code: Any = None) -> None:
         """Send arm night command."""
@@ -132,4 +132,4 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
             self._attr_state = STATE_ALARM_ARMED_NIGHT
 
         else:
-            raise HTTPError("Cannot arm alarm, check for violated zones.")
+            raise HTTPError(f"Cannot arm alarm, check for violated zones. {response}")
