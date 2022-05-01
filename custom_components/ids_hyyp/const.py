@@ -16,3 +16,10 @@ DEFAULT_TIMEOUT = 25
 
 # Data
 DATA_COORDINATOR = "coordinator"
+
+# Service names
+SERVICE_BYPASS_ZONE = "zone_bypass_code"
+
+# Attributes
+ATTR_BYPASS_CODE = "bypass_code"
+ATTR_ARM_CODE = "arm_code"

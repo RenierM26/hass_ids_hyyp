@@ -7,14 +7,26 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_TIMEOUT, CONF_TOKEN
+from homeassistant.const import (
+    CONF_EMAIL,
+    CONF_PASSWORD,
+    CONF_TIMEOUT,
+    CONF_TOKEN,
+)
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from pyhyypapi.client import HyypClient
 from pyhyypapi.constants import DEFAULT_TIMEOUT
 from pyhyypapi.exceptions import HTTPError, HyypApiError, InvalidURL
 
-from .const import CONF_PKG, DOMAIN, PKG_ADT_SECURE_HOME, PKG_IDS_HYYP
+from .const import (
+    ATTR_ARM_CODE,
+    ATTR_BYPASS_CODE,
+    CONF_PKG,
+    DOMAIN,
+    PKG_ADT_SECURE_HOME,
+    PKG_IDS_HYYP,
+)
 
 _LOGGER = logging.getLogger(__name__)
 DEFAULT_OPTIONS = {
@@ -124,6 +136,8 @@ class HyypOptionsFlowHandler(OptionsFlow):
                         CONF_TIMEOUT, DEFAULT_TIMEOUT
                     ),
                 ): int,
+                vol.Optional(ATTR_ARM_CODE): str,
+                vol.Optional(ATTR_BYPASS_CODE): str,
             }
         )
 

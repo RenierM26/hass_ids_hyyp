@@ -25,7 +25,9 @@
     "step": {
       "init": {
         "data": {
-          "timeout": "Request Timeout (seconds)"
+          "timeout": "Request Timeout (seconds)",
+          "bypass_code": "Bypass code",
+          "arm_code": "Arm code"
         }
       }
     }

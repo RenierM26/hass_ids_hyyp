@@ -4,12 +4,19 @@ from __future__ import annotations
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_TIMEOUT, CONF_TOKEN, Platform
+from homeassistant.const import ATTR_CODE, CONF_TIMEOUT, CONF_TOKEN, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from pyhyypapi import HTTPError, HyypApiError, HyypClient, InvalidURL
 
-from .const import CONF_PKG, DATA_COORDINATOR, DEFAULT_TIMEOUT, DOMAIN
+from .const import (
+    ATTR_ARM_CODE,
+    ATTR_BYPASS_CODE,
+    CONF_PKG,
+    DATA_COORDINATOR,
+    DEFAULT_TIMEOUT,
+    DOMAIN,
+)
 from .coordinator import HyypDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,6 +34,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not entry.options:
         options = {
             CONF_TIMEOUT: DEFAULT_TIMEOUT,
+            ATTR_ARM_CODE: None,
+            ATTR_BYPASS_CODE: None,
         }
 
         hass.config_entries.async_update_entry(entry, options=options)
