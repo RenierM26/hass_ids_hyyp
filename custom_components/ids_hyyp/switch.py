@@ -12,12 +12,7 @@ from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from pyhyypapi.exceptions import HTTPError, HyypApiError
 
-from .const import (
-    ATTR_BYPASS_CODE,
-    DATA_COORDINATOR,
-    DOMAIN,
-    SERVICE_BYPASS_ZONE,
-)
+from .const import ATTR_BYPASS_CODE, DATA_COORDINATOR, DOMAIN, SERVICE_BYPASS_ZONE
 from .coordinator import HyypDataUpdateCoordinator
 from .entity import HyypEntity
 

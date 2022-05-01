@@ -7,12 +7,7 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
-from homeassistant.const import (
-    CONF_EMAIL,
-    CONF_PASSWORD,
-    CONF_TIMEOUT,
-    CONF_TOKEN,
-)
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_TIMEOUT, CONF_TOKEN
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from pyhyypapi.client import HyypClient

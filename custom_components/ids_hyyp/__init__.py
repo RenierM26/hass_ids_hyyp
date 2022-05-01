@@ -1,13 +1,12 @@
-"""Support for Ezviz camera."""
+"""Support for IDS Hyyp Alarm."""
 from __future__ import annotations
 
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_CODE, CONF_TIMEOUT, CONF_TOKEN, Platform
+from homeassistant.const import CONF_TIMEOUT, CONF_TOKEN, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-from pyhyypapi import HTTPError, HyypApiError, HyypClient, InvalidURL
+from pyhyypapi import HyypClient
 
 from .const import (
     ATTR_ARM_CODE,
