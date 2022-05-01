@@ -22,7 +22,7 @@ class HyypEntity(CoordinatorEntity[HyypDataUpdateCoordinator], Entity):
         super().__init__(coordinator)
         self._partition_id = partition_id
         self._site_id = list(self.data["site"])[0]
-        self._arm_night_profile_id = list(self.data["stayProfile"])[
+        self._arm_home_profile_id = list(self.data["stayProfile"])[
             0
         ]  # Supports multiple stay profiles. Assume first is arm night.
         self._attr_device_info = DeviceInfo(

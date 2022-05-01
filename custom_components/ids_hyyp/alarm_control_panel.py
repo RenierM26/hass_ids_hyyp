@@ -3,15 +3,18 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.alarm_control_panel import AlarmControlPanelEntity
+from homeassistant.components.alarm_control_panel import (
+    AlarmControlPanelEntity,
+    FORMAT_NUMBER,
+)
 from homeassistant.components.alarm_control_panel.const import (
     SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_NIGHT,
+    SUPPORT_ALARM_ARM_HOME,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY,
-    STATE_ALARM_ARMED_NIGHT,
+    STATE_ALARM_ARMED_HOME,
     STATE_ALARM_DISARMED,
     STATE_ALARM_TRIGGERED,
 )
@@ -42,8 +45,8 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
     """Representation of a Hyyp alarm control panel."""
 
     coordinator: HyypDataUpdateCoordinator
-    _attr_supported_features = SUPPORT_ALARM_ARM_AWAY | SUPPORT_ALARM_ARM_NIGHT
-    _attr_code_arm_required = True
+    _attr_supported_features = SUPPORT_ALARM_ARM_AWAY | SUPPORT_ALARM_ARM_HOME
+    _attr_code_format = FORMAT_NUMBER
 
     def __init__(
         self, coordinator: HyypDataUpdateCoordinator, partition_id: str
@@ -72,7 +75,7 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
             self._attr_state = STATE_ALARM_DISARMED
 
         if self.data["armed"] and self.data["stayArmed"]:
-            self._attr_state = STATE_ALARM_ARMED_NIGHT
+            self._attr_state = STATE_ALARM_ARMED_HOME
 
         return self._attr_state
 
@@ -114,22 +117,22 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
         else:
             raise HTTPError(f"Cannot arm alarm, check for violated zones. {response}")
 
-    def alarm_arm_night(self, code: Any = None) -> None:
-        """Send arm night command."""
+    def alarm_arm_home(self, code: Any = None) -> None:
+        """Send arm home command."""
         try:
             response = self.coordinator.hyyp_client.arm_site(
                 arm=True,
                 pin=code,
                 partition_id=self._partition_id,
                 site_id=self._site_id,
-                stay_profile_id=self._arm_night_profile_id,
+                stay_profile_id=self._arm_home_profile_id,
             )
 
         except (HTTPError, HyypApiError) as err:
             raise HyypApiError("Cannot disarm alarm") from err
 
         if response["status"] == "SUCCESS":
-            self._attr_state = STATE_ALARM_ARMED_NIGHT
+            self._attr_state = STATE_ALARM_ARMED_HOME
 
         else:
             raise HTTPError(f"Cannot arm alarm, check for violated zones. {response}")
