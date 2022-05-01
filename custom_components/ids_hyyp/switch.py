@@ -55,8 +55,24 @@ class HyypSwitch(HyypEntity, SwitchEntity):
         """Return the state of the switch."""
         return not self.data["zones"][self._zone_id]["bypassed"]
 
-    async def async_toggle(self, **kwargs: Any) -> None:
-        """Toggle the entity."""
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the switch entity on."""
+        try:
+            update_ok = await self.hass.async_add_executor_job(
+                self.coordinator.hyyp_client.set_zone_bypass,
+                self._partition_id,
+                self._zone_id,
+                0,
+            )
+
+        except (HTTPError, HyypApiError) as err:
+            raise HyypApiError("Failed to turn on switch {self._attr_name}") from err
+
+        if update_ok:
+            await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn the switch entity off."""
         try:
             update_ok = await self.hass.async_add_executor_job(
                 self.coordinator.hyyp_client.set_zone_bypass,
