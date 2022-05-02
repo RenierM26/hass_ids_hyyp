@@ -52,7 +52,7 @@ class HyypConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(config_entry: ConfigEntry) -> HyypOptionsFlowHandler:
         """Get the options flow for this handler."""
         return HyypOptionsFlowHandler(config_entry)
 

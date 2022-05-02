@@ -20,10 +20,11 @@ from .coordinator import HyypDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: dict[str, list] = {
+PLATFORMS: list[Platform] = [
     Platform.ALARM_CONTROL_PANEL,
+    Platform.SENSOR,
     Platform.SWITCH,
-}
+]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -39,9 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         hass.config_entries.async_update_entry(entry, options=options)
 
-    hyyp_client = HyypClient(
-        token=entry.data.get(CONF_TOKEN), pkg=entry.data.get(CONF_PKG)
-    )
+    hyyp_client = HyypClient(token=entry.data[CONF_TOKEN], pkg=entry.data[CONF_PKG])
 
     coordinator = HyypDataUpdateCoordinator(
         hass, api=hyyp_client, api_timeout=entry.options[CONF_TIMEOUT]

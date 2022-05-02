@@ -24,7 +24,7 @@ class HyypEntity(CoordinatorEntity[HyypDataUpdateCoordinator], Entity):
         self._site_id = list(self.data["site"])[0]
         self._arm_home_profile_id = list(self.data["stayProfile"])[
             0
-        ]  # Supports multiple stay profiles. Assume first is arm night.
+        ]  # Supports multiple stay profiles. Assume first is arm home.
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, self._site_id)},
             manufacturer=MANUFACTURER,
@@ -33,6 +33,6 @@ class HyypEntity(CoordinatorEntity[HyypDataUpdateCoordinator], Entity):
         )
 
     @property
-    def data(self) -> dict[str, Any]:
+    def data(self) -> Any:
         """Return coordinator data for this entity."""
         return self.coordinator.data[self._partition_id]

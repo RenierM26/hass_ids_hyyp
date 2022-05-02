@@ -53,7 +53,7 @@ class HyypSwitch(HyypEntity, SwitchEntity):
         coordinator: HyypDataUpdateCoordinator,
         partition_id: str,
         zone_id: str,
-        bypass_code,
+        bypass_code: str | None,
     ) -> None:
         """Initialize the switch."""
         super().__init__(coordinator, partition_id)
@@ -65,7 +65,7 @@ class HyypSwitch(HyypEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Check if device is reporting online from api."""
-        return self.data["site"][self._site_id]
+        return bool(self.data["site"][self._site_id]["isOnline"])
 
     @property
     def is_on(self) -> bool:

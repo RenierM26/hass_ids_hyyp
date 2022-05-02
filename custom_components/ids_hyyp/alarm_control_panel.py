@@ -53,7 +53,10 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
     _attr_code_format = FORMAT_NUMBER
 
     def __init__(
-        self, coordinator: HyypDataUpdateCoordinator, partition_id: str, arm_code: str
+        self,
+        coordinator: HyypDataUpdateCoordinator,
+        partition_id: str,
+        arm_code: str | None,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, partition_id)
@@ -65,7 +68,7 @@ class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
     @property
     def available(self) -> bool:
         """Check if device is reporting online from api."""
-        return self.data["site"][self._site_id]
+        return bool(self.data["site"][self._site_id]["isOnline"])
 
     @property
     def state(self) -> StateType:

@@ -1,6 +1,7 @@
 """Provides the ezviz DataUpdateCoordinator."""
 from datetime import timedelta
 import logging
+from typing import Any
 
 from async_timeout import timeout
 
@@ -27,7 +28,7 @@ class HyypDataUpdateCoordinator(DataUpdateCoordinator):
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=update_interval)
 
-    async def _async_update_data(self) -> dict:
+    async def _async_update_data(self) -> dict[Any, Any]:
         """Fetch data from IDS Hyyp."""
         try:
             async with timeout(self._api_timeout):
