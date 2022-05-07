@@ -63,11 +63,11 @@ class HyypAlarm(HyypPartitionEntity, AlarmControlPanelEntity):
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, site_id, partition_id)
-        self._attr_name = self._partition_data["name"]
+        self._attr_name = self.partition_data["name"]
         self._arm_code = arm_code
         self._attr_unique_id = f"{self._site_id}_{partition_id}"
         self._attr_code_arm_required = bool(arm_code)
-        self._arm_home_profile_id = list(self._partition_data["stayProfiles"])[
+        self._arm_home_profile_id = list(self.partition_data["stayProfiles"])[
             0
         ]  # Supports multiple stay profiles. Assume first is arm home.
 
@@ -80,11 +80,11 @@ class HyypAlarm(HyypPartitionEntity, AlarmControlPanelEntity):
     def state(self) -> StateType:
         """Update alarm state."""
 
-        if self._partition_data["alarm"]:
+        if self.partition_data["alarm"]:
             return STATE_ALARM_TRIGGERED
 
-        if self._partition_data["armed"]:
-            if self._partition_data["stayArmed"]:
+        if self.partition_data["armed"]:
+            if self.partition_data["stayArmed"]:
                 return STATE_ALARM_ARMED_HOME
 
             return STATE_ALARM_ARMED_AWAY

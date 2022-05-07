@@ -46,4 +46,8 @@ class HyypPartitionEntity(HyypSiteEntity):
         """Initialize the entity."""
         super().__init__(coordinator, site_id)
         self._partition_id = partition_id
-        self._partition_data = self.data["partitions"][partition_id]
+
+    @property
+    def partition_data(self) -> Any:
+        """Return partition coordinator data for this entity."""
+        return self.coordinator.data[self._site_id]["partitions"][self._partition_id]
