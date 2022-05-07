@@ -14,7 +14,7 @@ from pyhyypapi.exceptions import HTTPError, HyypApiError
 
 from .const import ATTR_BYPASS_CODE, DATA_COORDINATOR, DOMAIN, SERVICE_BYPASS_ZONE
 from .coordinator import HyypDataUpdateCoordinator
-from .entity import HyypEntity
+from .entity import HyypPartitionEntity
 
 
 async def async_setup_entry(
@@ -28,9 +28,12 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            HyypSwitch(coordinator, partition_id, zone_id, bypass_code)
-            for partition_id in coordinator.data
-            for zone_id in coordinator.data[partition_id]["zones"]
+            HyypSwitch(coordinator, site_id, partition_id, zone_id, bypass_code)
+            for site_id in coordinator.data
+            for partition_id in coordinator.data[site_id]["partitions"]
+            for zone_id in coordinator.data[site_id]["partitions"][partition_id][
+                "zones"
+            ]
         ]
     )
 
@@ -43,7 +46,7 @@ async def async_setup_entry(
     )
 
 
-class HyypSwitch(HyypEntity, SwitchEntity):
+class HyypSwitch(HyypPartitionEntity, SwitchEntity):
     """Representation of a IDS Hyyp entity Switch."""
 
     _attr_device_class = SwitchDeviceClass.SWITCH
@@ -51,26 +54,27 @@ class HyypSwitch(HyypEntity, SwitchEntity):
     def __init__(
         self,
         coordinator: HyypDataUpdateCoordinator,
-        partition_id: str,
+        site_id: int,
+        partition_id: int,
         zone_id: str,
         bypass_code: str | None,
     ) -> None:
         """Initialize the switch."""
-        super().__init__(coordinator, partition_id)
+        super().__init__(coordinator, site_id, partition_id)
         self._bypass_code = bypass_code
         self._zone_id = zone_id
-        self._attr_name = f"{self.data['zones'][zone_id]['name'].title()}"
+        self._attr_name = f"{self._partition_data['zones'][zone_id]['name'].title()}"
         self._attr_unique_id = f"{self._site_id}_{partition_id}_{zone_id}"
 
     @property
     def available(self) -> bool:
         """Check if device is reporting online from api."""
-        return bool(self.data["site"][self._site_id]["isOnline"])
+        return bool(self.data["isOnline"])
 
     @property
     def is_on(self) -> bool:
         """Return the state of the switch."""
-        return not self.data["zones"][self._zone_id]["bypassed"]
+        return not self._partition_data["zones"][self._zone_id]["bypassed"]
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch entity on."""

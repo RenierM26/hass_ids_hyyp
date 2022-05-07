@@ -10,23 +10,19 @@ from .const import DOMAIN, MANUFACTURER, MODEL
 from .coordinator import HyypDataUpdateCoordinator
 
 
-class HyypEntity(CoordinatorEntity[HyypDataUpdateCoordinator], Entity):
-    """Generic entity encapsulating common features of Hyyp Alarms."""
+class HyypSiteEntity(CoordinatorEntity[HyypDataUpdateCoordinator], Entity):
+    """Generic entity encapsulating common features of IDS Hyyp site/device."""
 
     def __init__(
         self,
         coordinator: HyypDataUpdateCoordinator,
-        partition_id: str,
+        site_id: int,
     ) -> None:
         """Initialize the entity."""
         super().__init__(coordinator)
-        self._partition_id = partition_id
-        self._site_id = list(self.data["site"])[0]
-        self._arm_home_profile_id = list(self.data["stayProfile"])[
-            0
-        ]  # Supports multiple stay profiles. Assume first is arm home.
+        self._site_id = site_id
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self._site_id)},
+            identifiers={(DOMAIN, str(self._site_id))},
             manufacturer=MANUFACTURER,
             model=MODEL,
             name=self.data["name"],
@@ -35,4 +31,19 @@ class HyypEntity(CoordinatorEntity[HyypDataUpdateCoordinator], Entity):
     @property
     def data(self) -> Any:
         """Return coordinator data for this entity."""
-        return self.coordinator.data[self._partition_id]
+        return self.coordinator.data[self._site_id]
+
+
+class HyypPartitionEntity(HyypSiteEntity):
+    """Generic entity encapsulating common features of IDS Hyyp partition."""
+
+    def __init__(
+        self,
+        coordinator: HyypDataUpdateCoordinator,
+        site_id: int,
+        partition_id: int,
+    ) -> None:
+        """Initialize the entity."""
+        super().__init__(coordinator, site_id)
+        self._partition_id = partition_id
+        self._partition_data = self.data["partitions"][partition_id]

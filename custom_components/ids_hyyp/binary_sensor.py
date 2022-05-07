@@ -1,9 +1,10 @@
-"""Support for Hyyp sensors."""
+"""Support for Hyyp binary sensors."""
 from __future__ import annotations
 
-from typing import Any
-
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.binary_sensor import (
+    BinarySensorEntity,
+    BinarySensorEntityDescription,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -14,17 +15,17 @@ from .entity import HyypSiteEntity
 
 PARALLEL_UPDATES = 1
 
-SENSOR_TYPES: dict[str, SensorEntityDescription] = {
-    "lastNoticeTime": SensorEntityDescription(key="lastNoticeTime"),
-    "lastNoticeName": SensorEntityDescription(key="lastNoticeName"),
-    "imei": SensorEntityDescription(key="imei"),
+BINARY_SENSOR_TYPES: dict[str, BinarySensorEntityDescription] = {
+    "isMaster": BinarySensorEntityDescription(key="isMaster"),
+    "hasPin": BinarySensorEntityDescription(key="hasPin"),
+    "isOnline": BinarySensorEntityDescription(key="isOnline"),
 }
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up IDS Hyyp sensors based on a config entry."""
+    """Set up IDS Hyyp binary sensors based on a config entry."""
     coordinator: HyypDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
         DATA_COORDINATOR
     ]
@@ -34,13 +35,13 @@ async def async_setup_entry(
             HyypSensor(coordinator, site_id, sensor)
             for site_id in coordinator.data
             for sensor, value in coordinator.data[site_id].items()
-            if sensor in SENSOR_TYPES
+            if sensor in BINARY_SENSOR_TYPES
             if value is not None
         ]
     )
 
 
-class HyypSensor(HyypSiteEntity, SensorEntity):
+class HyypSensor(HyypSiteEntity, BinarySensorEntity):
     """Representation of a IDS Hyyp sensor."""
 
     coordinator: HyypDataUpdateCoordinator
@@ -49,16 +50,16 @@ class HyypSensor(HyypSiteEntity, SensorEntity):
         self,
         coordinator: HyypDataUpdateCoordinator,
         site_id: int,
-        sensor: str,
+        binary_sensor: str,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, site_id)
-        self._sensor_name = sensor
-        self._attr_name = f"{self.data['name']} {sensor.title()}"
-        self._attr_unique_id = f"{self._site_id}_{sensor}"
-        self.entity_description = SENSOR_TYPES[sensor]
+        self._sensor_name = binary_sensor
+        self._attr_name = f"{self.data['name']} {binary_sensor.title()}"
+        self._attr_unique_id = f"{self._site_id}_{binary_sensor}"
+        self.entity_description = BINARY_SENSOR_TYPES[binary_sensor]
 
     @property
-    def native_value(self) -> Any:
-        """Return the state of the sensor."""
-        return self.data[self._sensor_name]
+    def is_on(self) -> bool:
+        """Return the state of the binary sensor."""
+        return bool(self.data[self._sensor_name])

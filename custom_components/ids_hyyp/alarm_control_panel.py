@@ -4,12 +4,9 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.alarm_control_panel import (
-    FORMAT_NUMBER,
     AlarmControlPanelEntity,
-)
-from homeassistant.components.alarm_control_panel.const import (
-    SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_HOME,
+    AlarmControlPanelEntityFeature,
+    CodeFormat,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -25,7 +22,7 @@ from pyhyypapi.exceptions import HTTPError, HyypApiError
 
 from .const import ATTR_ARM_CODE, DATA_COORDINATOR, DOMAIN
 from .coordinator import HyypDataUpdateCoordinator
-from .entity import HyypEntity
+from .entity import HyypPartitionEntity
 
 
 async def async_setup_entry(
@@ -39,54 +36,59 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            HyypAlarm(coordinator, partition_id, arm_code)
-            for partition_id in coordinator.data
+            HyypAlarm(coordinator, site_id, partition_id, arm_code)
+            for site_id in coordinator.data
+            for partition_id in coordinator.data[site_id]["partitions"]
         ]
     )
 
 
-class HyypAlarm(HyypEntity, AlarmControlPanelEntity):
+class HyypAlarm(HyypPartitionEntity, AlarmControlPanelEntity):
     """Representation of a Hyyp alarm control panel."""
 
     coordinator: HyypDataUpdateCoordinator
-    _attr_supported_features = SUPPORT_ALARM_ARM_AWAY | SUPPORT_ALARM_ARM_HOME
-    _attr_code_format = FORMAT_NUMBER
+    _attr_supported_features = (
+        AlarmControlPanelEntityFeature.ARM_HOME
+        | AlarmControlPanelEntityFeature.ARM_AWAY
+    )
+    _attr_code_format = CodeFormat.NUMBER
 
     def __init__(
         self,
         coordinator: HyypDataUpdateCoordinator,
-        partition_id: str,
+        site_id: int,
+        partition_id: int,
         arm_code: str | None,
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator, partition_id)
-        self._attr_name = self.data["name"]
+        super().__init__(coordinator, site_id, partition_id)
+        self._attr_name = self._partition_data["name"]
         self._arm_code = arm_code
-        self._attr_unique_id = f"{self._site_id}_{partition_id}_Alarm"
+        self._attr_unique_id = f"{self._site_id}_{partition_id}"
         self._attr_code_arm_required = bool(arm_code)
+        self._arm_home_profile_id = list(self._partition_data["stayProfiles"])[
+            0
+        ]  # Supports multiple stay profiles. Assume first is arm home.
 
     @property
     def available(self) -> bool:
         """Check if device is reporting online from api."""
-        return bool(self.data["site"][self._site_id]["isOnline"])
+        return bool(self.data["isOnline"])
 
     @property
     def state(self) -> StateType:
         """Update alarm state."""
 
-        if self.data["alarm"]:
-            return self._attr_state == STATE_ALARM_TRIGGERED
+        if self._partition_data["alarm"]:
+            return STATE_ALARM_TRIGGERED
 
-        if self.data["armed"] and not self.data["stayArmed"]:
-            self._attr_state = STATE_ALARM_ARMED_AWAY
+        if self._partition_data["armed"]:
+            if self._partition_data["stayArmed"]:
+                return STATE_ALARM_ARMED_HOME
 
-        if not self.data["armed"] and not self.data["stayArmed"]:
-            self._attr_state = STATE_ALARM_DISARMED
+            return STATE_ALARM_ARMED_AWAY
 
-        if self.data["armed"] and self.data["stayArmed"]:
-            self._attr_state = STATE_ALARM_ARMED_HOME
-
-        return self._attr_state
+        return STATE_ALARM_DISARMED
 
     def alarm_disarm(self, code: Any = None) -> None:
         """Send disarm command."""
