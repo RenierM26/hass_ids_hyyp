@@ -90,66 +90,71 @@ class HyypAlarm(HyypPartitionEntity, AlarmControlPanelEntity):
 
         return STATE_ALARM_DISARMED
 
-    def alarm_disarm(self, code: Any = None) -> None:
+    async def async_alarm_disarm(self, code: Any = None) -> None:
         """Send disarm command."""
         _code = code if not bool(self._arm_code) else self._arm_code
 
         try:
-            response = self.coordinator.hyyp_client.arm_site(
-                arm=False,
-                pin=_code,
-                partition_id=self._partition_id,
-                site_id=self._site_id,
+            update_ok = await self.hass.async_add_executor_job(
+                self.coordinator.hyyp_client.arm_site,
+                self._site_id,
+                False,
+                _code,
+                self._partition_id,
             )
 
         except (HTTPError, HyypApiError) as err:
             raise HyypApiError("Cannot disarm alarm") from err
 
-        if response["status"] == "SUCCESS":
-            self._attr_state = STATE_ALARM_DISARMED
+        if update_ok["status"] == "SUCCESS":
+            await self.coordinator.async_request_refresh()
 
         else:
-            raise HTTPError(f"Cannot disarm alarm: {response}")
+            raise HTTPError(f"Cannot disarm alarm: {update_ok}")
 
-    def alarm_arm_away(self, code: Any = None) -> None:
+    async def async_alarm_arm_away(self, code: Any = None) -> None:
         """Send arm away command."""
         _code = code if not bool(self._arm_code) else self._arm_code
 
         try:
-            response = self.coordinator.hyyp_client.arm_site(
-                arm=True,
-                pin=_code,
-                partition_id=self._partition_id,
-                site_id=self._site_id,
+            update_ok = await self.hass.async_add_executor_job(
+                self.coordinator.hyyp_client.arm_site,
+                self._site_id,
+                True,
+                _code,
+                self._partition_id,
             )
 
         except (HTTPError, HyypApiError) as err:
-            raise HyypApiError("Cannot disarm alarm") from err
+            raise HyypApiError("Cannot arm alarm") from err
 
-        if response["status"] == "SUCCESS":
-            self._attr_state = STATE_ALARM_ARMED_AWAY
+        if update_ok["status"] == "SUCCESS":
+            await self.coordinator.async_request_refresh()
 
         else:
-            raise HTTPError(f"Cannot arm alarm, check for violated zones. {response}")
+            raise HTTPError(f"Cannot arm alarm, check for violated zones. {update_ok}")
 
-    def alarm_arm_home(self, code: Any = None) -> None:
+    async def async_alarm_arm_home(self, code: Any = None) -> None:
         """Send arm home command."""
         _code = code if not bool(self._arm_code) else self._arm_code
 
         try:
-            response = self.coordinator.hyyp_client.arm_site(
-                arm=True,
-                pin=_code,
-                partition_id=self._partition_id,
-                site_id=self._site_id,
-                stay_profile_id=self._arm_home_profile_id,
+            update_ok = await self.hass.async_add_executor_job(
+                self.coordinator.hyyp_client.arm_site,
+                self._site_id,
+                True,
+                _code,
+                self._partition_id,
+                self._arm_home_profile_id,
             )
 
         except (HTTPError, HyypApiError) as err:
-            raise HyypApiError("Cannot disarm alarm") from err
+            raise HyypApiError("Cannot arm home alarm") from err
 
-        if response["status"] == "SUCCESS":
-            self._attr_state = STATE_ALARM_ARMED_HOME
+        if update_ok["status"] == "SUCCESS":
+            await self.coordinator.async_request_refresh()
 
         else:
-            raise HTTPError(f"Cannot arm alarm, check for violated zones. {response}")
+            raise HTTPError(
+                f"Cannot arm home alarm, check for violated zones. {update_ok}"
+            )

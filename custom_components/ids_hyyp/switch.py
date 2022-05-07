@@ -81,8 +81,8 @@ class HyypSwitch(HyypPartitionEntity, SwitchEntity):
         try:
             update_ok = await self.hass.async_add_executor_job(
                 self.coordinator.hyyp_client.set_zone_bypass,
-                self._partition_id,
                 self._zone_id,
+                self._partition_id,
                 0,
                 self._bypass_code,
             )
@@ -106,8 +106,8 @@ class HyypSwitch(HyypPartitionEntity, SwitchEntity):
         try:
             update_ok = await self.hass.async_add_executor_job(
                 self.coordinator.hyyp_client.set_zone_bypass,
-                self._partition_id,
                 self._zone_id,
+                self._partition_id,
                 0,
                 self._bypass_code,
             )
@@ -131,8 +131,8 @@ class HyypSwitch(HyypPartitionEntity, SwitchEntity):
         try:
             update_ok = await self.hass.async_add_executor_job(
                 self.coordinator.hyyp_client.set_zone_bypass,
-                self._partition_id,
                 self._zone_id,
+                self._partition_id,
                 0,
                 code,
             )
