@@ -50,6 +50,7 @@ class HyypAlarm(HyypPartitionEntity, AlarmControlPanelEntity):
     _attr_supported_features = (
         AlarmControlPanelEntityFeature.ARM_HOME
         | AlarmControlPanelEntityFeature.ARM_AWAY
+        | AlarmControlPanelEntityFeature.TRIGGER
     )
     _attr_code_format = CodeFormat.NUMBER
 
@@ -158,3 +159,24 @@ class HyypAlarm(HyypPartitionEntity, AlarmControlPanelEntity):
             raise HTTPError(
                 f"Cannot arm home alarm, check for violated zones. {update_ok}"
             )
+
+    async def async_alarm_trigger(self, code: Any = None) -> None:
+        """Send alarm trigger."""
+        _code = code if not bool(self._arm_code) else self._arm_code
+
+        try:
+            update_ok = await self.hass.async_add_executor_job(
+                self.coordinator.hyyp_client.trigger_alarm,
+                self._site_id,
+                _code,
+                self._partition_id,
+            )
+
+        except (HTTPError, HyypApiError) as err:
+            raise HyypApiError("Cannot trigger alarm") from err
+
+        if update_ok["status"] == "SUCCESS":
+            await self.coordinator.async_request_refresh()
+
+        else:
+            raise HTTPError(f"Cannot trigger alarm. {update_ok}")
