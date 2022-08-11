@@ -1,4 +1,4 @@
-"""Constants for the ezviz integration."""
+"""Constants for the ids_hyyp integration."""
 
 DOMAIN = "ids_hyyp"
 MANUFACTURER = "IDS"

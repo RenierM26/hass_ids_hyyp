@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from pyhyypapi.exceptions import HTTPError, HyypApiError
 import voluptuous as vol
 
 from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity
@@ -10,7 +11,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from pyhyypapi.exceptions import HTTPError, HyypApiError
 
 from .const import ATTR_BYPASS_CODE, DATA_COORDINATOR, DOMAIN, SERVICE_BYPASS_ZONE
 from .coordinator import HyypDataUpdateCoordinator

@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import logging
 
+from pyhyypapi import HyypClient
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_TIMEOUT, CONF_TOKEN, Platform
 from homeassistant.core import HomeAssistant
-from pyhyypapi import HyypClient
 
 from .const import (
     ATTR_ARM_CODE,
@@ -53,7 +54,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 

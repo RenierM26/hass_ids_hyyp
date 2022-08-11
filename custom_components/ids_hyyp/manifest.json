@@ -1,10 +1,10 @@
 {
   "domain": "ids_hyyp",
   "name": "IDS Hyyp(Beta)",
-  "version": "0.0.0.7",
+  "version": "0.0.0.8",
   "documentation": "https://www.home-assistant.io/integrations/idshyyp",
   "codeowners": ["@RenierM26"],
-  "requirements": ["pyhyypapi==0.0.0.5"],
+  "requirements": ["pyhyypapi==0.0.0.6"],
   "config_flow": true,
   "iot_class": "cloud_polling"
 }
