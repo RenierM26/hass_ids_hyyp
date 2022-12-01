@@ -85,7 +85,7 @@ class HyypAlarm(HyypPartitionEntity, AlarmControlPanelEntity):
             return STATE_ALARM_TRIGGERED
 
         if self.partition_data["armed"]:
-            if self.partition_data["stayArmed"]:
+            if "stayArmed" in self.partition_data and self.partition_data["stayArmed"]:
                 return STATE_ALARM_ARMED_HOME
 
             return STATE_ALARM_ARMED_AWAY
